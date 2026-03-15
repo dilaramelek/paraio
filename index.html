@@ -595,6 +595,7 @@ body::before {
       <div class="fg">
         <label class="fl">Açıklama</label>
         <input class="fi" id="f-not" placeholder="ör. Migros alışveriş">
+        <div id="cat-suggest" style="font-size:11px;color:var(--teal);margin-top:5px;opacity:0;transition:opacity 0.3s;font-family:var(--fd)"></div>
       </div>
       <div class="fg">
         <label class="fl">Tutar (₺)</label>
@@ -825,40 +826,109 @@ function goPage(id) {
   if(map[id]) document.getElementById(map[id]).classList.add('active');
 }
 
-// ── AI CHAT ──
-const aiR = {
-  'tasarruf':'Tasarruf için 3 altın kural: 1️⃣ Her ay gelirinizin %20\'sini otomatik kenara al. 2️⃣ Market alışverişine listeyle git, hazırsız gitme. 3️⃣ Kullanmadığın abonelikleri iptal et. Küçük adımlar büyük fark yaratır! 💪',
-  'ek gelir':'Ek gelir için 5 seçenek: 💻 Upwork\'te freelance iş, 📸 Shutterstock\'ta fotoğraf sat, 🎓 Udemy\'de kurs yayınla, 🛍️ Trendyol\'da ürün sat, 🚴 Kurye uygulamalarında çalış. Hangisi ilgini çekiyor?',
-  'yatırım':'Başlangıç yatırımı için güvenli seçenekler: 🥇 Altın (değer korur), 💵 Döviz (USD/EUR), 🏦 Yüksek faizli mevduat, 📈 Borsa (uzun vadeli). Acemiysen küçük miktarlarla başla! ⚠️',
-  'freelance':'Freelance başlamak için: 1️⃣ Upwork veya Fiverr\'da profil aç. 2️⃣ İlk müşteri için düşük fiyat, sonra artır. 3️⃣ Tasarım, yazarlık, çeviri, kodlama en çok aranan alanlar. 4️⃣ LinkedIn profilini güncelle. 🚀',
-  'birikim':'Birikim için 50/30/20 kuralı: Gelirinin %50\'si ihtiyaçlar, %30\'u istekler, %20\'si birikim. Otomatik transfer kur — görme, harcama! Her ay küçük artır. 🎯',
-  'hedef':'Hedef koymak için SMART yöntemi: Spesifik (net hedef), Ölçülebilir (₺ tutarı), Ulaşılabilir (gerçekçi), İlgili (sana uygun), Zamanlı (son tarih). Hedefler sekmesinden takip et! 🎯',
-  'default':'Güzel soru! Daha detaylı sorabilirsin: "tasarruf", "ek gelir", "yatırım", "freelance", "birikim", "hedef" konularında sana özel öneriler sunabilirim ✦'
+// ── OTOMATİK KATEGORİ TAHMİNİ ──
+const catKeywords = {
+  'Market':    ['migros','bim','a101','şok','carrefour','market','süpermarket','bakkal','manav','kasap','temizlik','deterjan','sabun'],
+  'Yemek':     ['yemek','restaurant','restoran','cafe','kahve','pizza','burger','döner','iskender','lahmacun','çay','türk','starbucks','mcdonald','kfc','getir','yemeksepeti','trendyol yemek','sipariş'],
+  'Ulaşım':    ['benzin','akaryakıt','opet','total','shell','bp','taksi','uber','bitaksi','otobus','metro','metrobüs','tren','uçak','thyao','pegasus','bilet','otoyol','hgs','ogs','park'],
+  'Fatura':    ['elektrik','doğalgaz','su','internet','telefon','turkcell','vodafone','türk telekom','ttnet','superonline','fatura','aidat','abonelik','netflix','spotify','youtube'],
+  'Kira':      ['kira','ev kirası','konut','daire','emlak'],
+  'Eğlence':   ['sinema','tiyatro','konser','oyun','steam','playstation','xbox','netflix','amazon prime','disney','kitap','müzik','gece','bar','eğlence','tatil','otel','bilet'],
+  'Sağlık':    ['eczane','ilaç','doktor','hastane','klinik','diş','göz','sağlık','sigorta','vitamin','tahlil','röntgen'],
+  'Gelir':     ['maaş','gelir','ödeme','transfer','yatırım','kira geliri','freelance','satış','bonus']
 };
 
-function initChat() {
-  const c=document.getElementById('chat');
-  c.innerHTML=`
-    <div class="cb cb-ai">Merhaba! Ben ParaIO'nun koçuyum ✦<br>Harcamalarını analiz eder, tasarruf önerileri sunar ve ek gelir fırsatları hakkında rehberlik yaparım.</div>
-    <div class="cb cb-ai" style="animation-delay:0.1s">💡 Şunu sorabilirsin: <strong>"tasarruf"</strong>, <strong>"ek gelir"</strong>, <strong>"yatırım"</strong> veya <strong>"freelance"</strong></div>`;
+function detectCategory(text) {
+  const low = text.toLowerCase().trim();
+  for (const [cat, keywords] of Object.entries(catKeywords)) {
+    if (keywords.some(k => low.includes(k))) return cat;
+  }
+  return null;
 }
 
-function send() {
-  const inp=document.getElementById('ci');
-  const msg=inp.value.trim(); if(!msg) return;
-  inp.value='';
-  const c=document.getElementById('chat');
-  c.innerHTML+=`<div class="cb cb-user">${msg}</div>`;
-  setTimeout(()=>{
-    const low=msg.toLowerCase();
-    let rep=aiR.default;
-    for(const [k,v] of Object.entries(aiR)){
-      if(k!=='default'&&low.includes(k)){rep=v;break;}
-    }
-    c.innerHTML+=`<div class="cb cb-ai">${rep}</div>`;
-    c.scrollTop=c.scrollHeight;
-  },650);
-  c.scrollTop=c.scrollHeight;
+// Açıklama yazılınca otomatik kategori seç
+document.getElementById('f-not').addEventListener('input', function() {
+  if (type === 'gelir') return;
+  const detected = detectCategory(this.value);
+  if (detected) {
+    selCatByName(detected);
+    const badge = document.getElementById('cat-suggest');
+    if (badge) { badge.textContent = `✦ "${detected}" seçildi`; badge.style.opacity='1'; setTimeout(()=>badge.style.opacity='0',2000); }
+  }
+});
+
+// ── GERÇEK AI API ──
+let chatHistory = [];
+
+function initChat() {
+  chatHistory = [];
+  const c = document.getElementById('chat');
+  c.innerHTML = `
+    <div class="cb cb-ai">Merhaba! Ben ParaIO'nun AI koçuyum ✦<br>Harcama verilerini analiz ederek <strong>sana özel</strong> öneriler sunuyorum — genel tavsiyeler değil, senin rakamlarına göre!</div>
+    <div class="cb cb-ai" style="animation-delay:0.1s">Dilediğin şeyi sorabilirsin: tasarruf, ek gelir, yatırım, birikim hedefi... 💡</div>`;
+}
+
+function buildContext() {
+  const gelir = txs.filter(t=>t.g).reduce((a,t)=>a+t.t,0);
+  const gider = txs.filter(t=>!t.g).reduce((a,t)=>a+t.t,0);
+  const cats = {};
+  txs.filter(t=>!t.g).forEach(t=>{cats[t.k]=(cats[t.k]||0)+t.t;});
+  const catStr = Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k}: ₺${v.toLocaleString('tr-TR')}`).join(', ');
+  const son5 = [...txs].reverse().slice(0,5).map(t=>`${t.n} (${t.k}, ${t.g?'+':'-'}₺${t.t})`).join('; ');
+  return `Kullanıcının ParaIO finansal verileri:
+- Toplam gelir: ₺${gelir.toLocaleString('tr-TR')}
+- Toplam gider: ₺${gider.toLocaleString('tr-TR')}
+- Net bakiye: ₺${(gelir-gider).toLocaleString('tr-TR')}
+- Kategori dağılımı: ${catStr || 'Henüz veri yok'}
+- Son işlemler: ${son5 || 'Henüz işlem yok'}
+- Toplam işlem: ${txs.length}`;
+}
+
+async function send() {
+  const inp = document.getElementById('ci');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+
+  const c = document.getElementById('chat');
+  c.innerHTML += `<div class="cb cb-user">${msg}</div>`;
+
+  // Typing indicator
+  const typingId = 'typing-' + Date.now();
+  c.innerHTML += `<div class="cb cb-ai" id="${typingId}" style="opacity:0.6">✦ &nbsp;<span style="animation:pulse 1s infinite">düşünüyor...</span></div>`;
+  c.scrollTop = c.scrollHeight;
+
+  chatHistory.push({ role: 'user', content: msg });
+
+  try {
+    const systemPrompt = `Sen ParaIO'nun kişisel finans koçusun. Kullanıcıya samimi, sade ve motive edici Türkçe cevaplar ver. Genel tavsiyeler değil, kullanıcının gerçek verilerine dayalı kişisel öneriler sun. Kısa ve öz ol — maksimum 3-4 cümle. Emoji kullan ama abartma. Politik ve yargılayıcı olma. Pozitif ve çözüm odaklı ol.
+
+${buildContext()}`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Bir sorun oluştu, tekrar dene.';
+
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    document.getElementById(typingId)?.remove();
+    c.innerHTML += `<div class="cb cb-ai">${reply}</div>`;
+  } catch (err) {
+    document.getElementById(typingId)?.remove();
+    c.innerHTML += `<div class="cb cb-ai" style="color:var(--rose)">Bağlantı hatası. İnternet bağlantını kontrol et. 🔌</div>`;
+  }
+
+  c.scrollTop = c.scrollHeight;
 }
 
 render();
