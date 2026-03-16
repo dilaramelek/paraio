@@ -494,8 +494,8 @@ body::before {
     <div class="qa-grid">
       <div class="qa" onclick="openAdd()"><div class="qa-ico">📤</div><div class="qa-lbl">Gider</div></div>
       <div class="qa" onclick="openAdd('gelir')"><div class="qa-ico">📥</div><div class="qa-lbl">Gelir</div></div>
-      <div class="qa" onclick="goPage('page-hedef')"><div class="qa-ico">🎯</div><div class="qa-lbl">Hedef</div></div>
-      <div class="qa" onclick="goPage('page-analiz')"><div class="qa-ico">📊</div><div class="qa-lbl">Analiz</div></div>
+      <div class="qa" onclick="goPage('page-abonelik')"><div class="qa-ico">📱</div><div class="qa-lbl">Abonelik</div></div>
+      <div class="qa" onclick="goPage('page-doviz')"><div class="qa-ico">💱</div><div class="qa-lbl">Döviz</div></div>
     </div>
 
     <div class="sh">
@@ -573,21 +573,191 @@ body::before {
     </div>
   </div>
 
+  <!-- ══ ABONELİK YÖNETİCİSİ ══ -->
+  <div class="page" id="page-abonelik">
+    <div class="sh" style="padding-top:20px">
+      <span class="sh-title">📱 Aboneliklerim</span>
+      <span class="sh-link" onclick="openAbonelikModal()">+ Ekle</span>
+    </div>
+    <div style="padding:0 16px">
+      <div id="abonelik-toplam" class="a-card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-family:var(--fd)">Aylık toplam</div>
+          <div style="font-family:var(--fd);font-size:28px;font-weight:700;color:var(--rose)" id="ab-toplam">₺0</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--text3);font-family:var(--fd)">Yıllık</div>
+          <div style="font-family:var(--fd);font-size:16px;font-weight:600;color:var(--text2)" id="ab-yillik">₺0</div>
+        </div>
+      </div>
+      <div id="abonelik-list"></div>
+      <div style="margin-top:12px;padding:16px;border:1.5px dashed rgba(167,139,250,0.2);border-radius:16px;text-align:center;cursor:pointer;color:var(--text3)" onclick="openAbonelikModal()">
+        <div style="font-size:24px;margin-bottom:6px">+</div>
+        <div style="font-family:var(--fd);font-size:13px">Abonelik ekle</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DÖVİZ & ALTIN ══ -->
+  <div class="page" id="page-doviz">
+    <div class="sh" style="padding-top:20px">
+      <span class="sh-title">💱 Döviz & Altın</span>
+      <span class="sh-link" onclick="dovizYenile()">↻ Güncelle</span>
+    </div>
+    <div style="padding:0 16px">
+      <div id="doviz-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"></div>
+      <div class="a-card">
+        <div class="a-title">Birikimim kaç döviz ediyor?</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <input class="fi" id="birikim-input" type="number" placeholder="₺ tutar gir" style="flex:1" oninput="hesaplaBirikim()">
+        </div>
+        <div id="birikim-sonuc" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+      </div>
+      <div class="a-card" style="margin-top:10px">
+        <div class="a-title">Net bakiyem</div>
+        <div id="bakiye-doviz" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FATURA TAKVİMİ ══ -->
+  <div class="page" id="page-fatura">
+    <div class="sh" style="padding-top:20px">
+      <span class="sh-title">📅 Fatura Takvimi</span>
+      <span class="sh-link" onclick="openFaturaModal()">+ Ekle</span>
+    </div>
+    <div style="padding:0 16px">
+      <div id="fatura-yakın" class="a-card" style="margin-bottom:10px">
+        <div class="a-title">Bu hafta ödenmesi gerekenler</div>
+        <div id="fatura-bu-hafta"></div>
+      </div>
+      <div id="fatura-list"></div>
+      <div style="margin-top:12px;padding:16px;border:1.5px dashed rgba(96,165,250,0.2);border-radius:16px;text-align:center;cursor:pointer;color:var(--text3)" onclick="openFaturaModal()">
+        <div style="font-size:24px;margin-bottom:6px">+</div>
+        <div style="font-family:var(--fd);font-size:13px">Fatura / ödeme ekle</div>
+      </div>
+    </div>
+  </div>
+
   <!-- BOTTOM NAV -->
   <div class="bnav">
-    <div class="bn active" id="n-home" onclick="goPage('page-home')"><div class="bn-ico">🏠</div>Ana Sayfa</div>
+    <div class="bn active" id="n-home" onclick="goPage('page-home')"><div class="bn-ico">🏠</div>Ana</div>
     <div class="bn" id="n-analiz" onclick="goPage('page-analiz')"><div class="bn-ico">📊</div>Analiz</div>
-    <div class="bn" id="n-hedef" onclick="goPage('page-hedef')"><div class="bn-ico">🎯</div>Hedefler</div>
+    <div class="bn" id="n-abonelik" onclick="goPage('page-abonelik')"><div class="bn-ico">📱</div>Abonelik</div>
+    <div class="bn" id="n-doviz" onclick="goPage('page-doviz')"><div class="bn-ico">💱</div>Döviz</div>
     <div class="bn" id="n-ai" onclick="goPage('page-ai')"><div class="bn-ico">✦</div>AI Koç</div>
   </div>
 
   <button class="fab" onclick="openAdd()">+</button>
+
+  <!-- SESLİ KAYIT FAB -->
+  <button id="voice-fab" onclick="toggleVoice()" style="
+    position:fixed; bottom:82px;
+    left: max(16px, calc(50% - 215px + 16px));
+    width:54px; height:54px; border-radius:50%;
+    background: linear-gradient(135deg, #059669, #34d399);
+    border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    box-shadow: 0 4px 24px rgba(52,211,153,0.4);
+    transition: transform 0.15s, box-shadow 0.15s; z-index:99;">
+    🎙️
+  </button>
+
+  <!-- SESLİ KAYIT MODAL -->
+  <div class="overlay" id="m-voice">
+    <div class="sheet" style="text-align:center;padding:30px 24px 44px">
+      <div class="handle"></div>
+      <div style="font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:6px">Sesli Harcama Ekle</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:24px">Mikrofona bas ve harcamanı söyle</div>
+
+      <!-- Mikrofon butonu -->
+      <div id="voice-btn" onclick="startVoice()" style="
+        width:90px; height:90px; border-radius:50%; margin:0 auto 20px;
+        background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.25));
+        border: 2px solid rgba(52,211,153,0.4);
+        display:flex; align-items:center; justify-content:center;
+        font-size:36px; cursor:pointer; transition:all 0.2s;">
+        🎙️
+      </div>
+
+      <!-- Durum metni -->
+      <div id="voice-status" style="font-size:13px;color:var(--text2);min-height:20px;font-family:var(--fd);margin-bottom:16px">
+        Butona bas ve konuş
+      </div>
+
+      <!-- Örnek komutlar -->
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:20px" id="voice-examples">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--fd);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Örnek komutlar</div>
+        <div onclick="fillVoiceExample('Migros\'a 486 lira harcadım')" style="background:var(--glass);border:0.5px solid var(--border2);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--text2);cursor:pointer;text-align:left">💬 "Migros'a 486 lira harcadım"</div>
+        <div onclick="fillVoiceExample('Benzin aldım 850 lira')" style="background:var(--glass);border:0.5px solid var(--border2);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--text2);cursor:pointer;text-align:left">💬 "Benzin aldım 850 lira"</div>
+        <div onclick="fillVoiceExample('Maaş yattı 18500 lira')" style="background:var(--glass);border:0.5px solid var(--border2);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--text2);cursor:pointer;text-align:left">💬 "Maaş yattı 18500 lira"</div>
+      </div>
+
+      <!-- Transkript -->
+      <div id="voice-transcript" style="display:none;background:var(--glass);border:1px solid rgba(52,211,153,0.2);border-radius:14px;padding:14px;margin-bottom:16px;font-size:14px;color:var(--text);font-style:italic;line-height:1.5"></div>
+
+      <!-- İşleniyor -->
+      <div id="voice-processing" style="display:none;color:var(--violet);font-size:13px;font-family:var(--fd);animation:pulse 1s infinite;margin-bottom:16px">✦ AI anlıyor...</div>
+
+      <!-- Sonuç önizleme -->
+      <div id="voice-result" style="display:none;background:var(--teal-dim);border:1px solid rgba(52,211,153,0.25);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left">
+        <div style="font-size:11px;color:var(--teal);font-family:var(--fd);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">✦ Anladım</div>
+        <div id="vr-not" style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px"></div>
+        <div style="display:flex;justify-content:space-between">
+          <span id="vr-kat" style="font-size:12px;color:var(--text2)"></span>
+          <span id="vr-tut" style="font-size:16px;font-weight:700;font-family:var(--fd);color:var(--teal)"></span>
+        </div>
+      </div>
+
+      <!-- Butonlar -->
+      <div style="display:flex;gap:10px">
+        <button onclick="closeM('m-voice')" style="flex:1;padding:13px;border-radius:14px;border:0.5px solid var(--border2);background:var(--glass);color:var(--text2);font-family:var(--fd);font-size:14px;cursor:pointer">İptal</button>
+        <button id="voice-save-btn" onclick="saveVoiceTx()" style="display:none;flex:1;padding:13px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--teal2),var(--teal));color:#0e0b1e;font-family:var(--fd);font-size:14px;font-weight:700;cursor:pointer">Kaydet ✓</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ADD MODAL -->
   <div class="overlay" id="m-add">
     <div class="sheet">
       <div class="handle"></div>
       <div class="sheet-title">Yeni İşlem</div>
+
+      <!-- FİŞ TARAMA BUTONU -->
+      <div id="scan-zone" style="margin-bottom:14px">
+        <input type="file" id="fis-input" accept="image/*" capture="environment" style="display:none" onchange="scanFis(this)">
+        <div onclick="document.getElementById('fis-input').click()" style="
+          border: 1.5px dashed rgba(167,139,250,0.35); border-radius:16px;
+          padding:16px; text-align:center; cursor:pointer;
+          background:rgba(167,139,250,0.05); transition: all 0.2s;
+          display:flex; align-items:center; justify-content:center; gap:10px;"
+          onmouseover="this.style.borderColor='rgba(167,139,250,0.6)'"
+          onmouseout="this.style.borderColor='rgba(167,139,250,0.35)'">
+          <span style="font-size:22px">📸</span>
+          <div style="text-align:left">
+            <div style="font-family:var(--fd);font-size:13px;font-weight:600;color:var(--violet)">Fiş veya Dekont Tara</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">AI otomatik okur, formu doldurur</div>
+          </div>
+          <span style="font-size:18px;margin-left:auto;color:var(--text3)">›</span>
+        </div>
+        <!-- Scanning state -->
+        <div id="scan-loading" style="display:none;text-align:center;padding:14px;color:var(--violet);font-size:13px;font-family:var(--fd)">
+          <div style="animation:pulse 1s infinite">✦ &nbsp;Fiş okunuyor...</div>
+        </div>
+        <!-- Preview -->
+        <div id="scan-preview" style="display:none;margin-top:8px;position:relative">
+          <img id="scan-img" style="width:100%;border-radius:12px;max-height:140px;object-fit:cover;opacity:0.7">
+          <div style="position:absolute;top:8px;right:8px;background:var(--teal);color:#0e0b1e;font-size:11px;padding:3px 10px;border-radius:20px;font-family:var(--fd);font-weight:700">✓ Okundu</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <div style="flex:1;height:0.5px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--text3);font-family:var(--fd)">veya manuel gir</span>
+        <div style="flex:1;height:0.5px;background:var(--border)"></div>
+      </div>
+
       <div class="type-row">
         <div class="tb ag" id="t-gid" onclick="setType('gider')">📤 Gider</div>
         <div class="tb" id="t-gel" onclick="setType('gelir')">📥 Gelir</div>
@@ -636,6 +806,68 @@ body::before {
     </div>
   </div>
 
+  <!-- ABONELİK MODAL -->
+  <div class="overlay" id="m-abonelik">
+    <div class="sheet">
+      <div class="handle"></div>
+      <div class="sheet-title">Abonelik Ekle</div>
+      <div class="fg">
+        <label class="fl">Abonelik adı</label>
+        <input class="fi" id="ab-ad" placeholder="ör. Netflix, Spotify, Gym">
+      </div>
+      <div class="fg">
+        <label class="fl">Aylık tutar (₺)</label>
+        <input class="fi" id="ab-tut" type="number" placeholder="0" inputmode="decimal">
+      </div>
+      <label class="fl">Kategori</label>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px" id="ab-cat-grid">
+        <div class="cc sel" onclick="selAbCat(this,'🎬','Eğlence')"><span class="ci">🎬</span>Eğlence</div>
+        <div class="cc" onclick="selAbCat(this,'🎵','Müzik')"><span class="ci">🎵</span>Müzik</div>
+        <div class="cc" onclick="selAbCat(this,'💪','Spor')"><span class="ci">💪</span>Spor</div>
+        <div class="cc" onclick="selAbCat(this,'📱','Yazılım')"><span class="ci">📱</span>Yazılım</div>
+        <div class="cc" onclick="selAbCat(this,'📰','Haber')"><span class="ci">📰</span>Haber</div>
+        <div class="cc" onclick="selAbCat(this,'☁️','Bulut')"><span class="ci">☁️</span>Bulut</div>
+        <div class="cc" onclick="selAbCat(this,'🎮','Oyun')"><span class="ci">🎮</span>Oyun</div>
+        <div class="cc" onclick="selAbCat(this,'📦','Diğer')"><span class="ci">📦</span>Diğer</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Yenileme günü</label>
+        <input class="fi" id="ab-gun" type="number" placeholder="ör. 15 (ayın 15'i)" min="1" max="31">
+      </div>
+      <button class="sbtn" onclick="addAbonelik()">Kaydet</button>
+    </div>
+  </div>
+
+  <!-- FATURA MODAL -->
+  <div class="overlay" id="m-fatura">
+    <div class="sheet">
+      <div class="handle"></div>
+      <div class="sheet-title">Fatura / Ödeme Ekle</div>
+      <div class="fg">
+        <label class="fl">Ödeme adı</label>
+        <input class="fi" id="fat-ad" placeholder="ör. Elektrik, Kira, Kredi Kartı">
+      </div>
+      <div class="fg">
+        <label class="fl">Tutar (₺)</label>
+        <input class="fi" id="fat-tut" type="number" placeholder="0" inputmode="decimal">
+      </div>
+      <div class="fg">
+        <label class="fl">Son ödeme tarihi</label>
+        <input class="fi" id="fat-tar" type="date">
+      </div>
+      <div class="fg">
+        <label class="fl">Tekrar</label>
+        <select class="fi" id="fat-tekrar">
+          <option value="bir-kez">Bir kez</option>
+          <option value="aylik" selected>Aylık</option>
+          <option value="3-aylik">3 Aylık</option>
+          <option value="yillik">Yıllık</option>
+        </select>
+      </div>
+      <button class="sbtn" onclick="addFatura()">Kaydet</button>
+    </div>
+  </div>
+
 </div>
 <script>
 // ── STATE ──
@@ -644,6 +876,7 @@ let filter = 'all';
 let cat = 'Market';
 let type = 'gider';
 let detId = null;
+let chatHistory = [];
 
 const icons = {Market:'🛒',Yemek:'🍔',Ulaşım:'🚌',Fatura:'💡',Kira:'🏠',Eğlence:'🎮',Sağlık:'💊',Gelir:'💼',Diğer:'📦'};
 const bgs = {
@@ -820,13 +1053,476 @@ function goPage(id) {
   document.getElementById(id).classList.add('active');
   const map={
     'page-home':'n-home','page-analiz':'n-analiz',
-    'page-hedef':'n-hedef','page-ai':'n-ai'
+    'page-abonelik':'n-abonelik','page-doviz':'n-doviz','page-ai':'n-ai'
   };
   document.querySelectorAll('.bn').forEach(n=>n.classList.remove('active'));
-  if(map[id]) document.getElementById(map[id]).classList.add('active');
+  if(map[id]) document.getElementById(map[id])?.classList.add('active');
+  if(id==='page-doviz') dovizYenile();
+  if(id==='page-abonelik') renderAbonelik();
+  if(id==='page-fatura') renderFatura();
 }
 
-// ── OTOMATİK KATEGORİ TAHMİNİ ──
+// ══ ABONELİK YÖNETİCİSİ ══
+let abonelikler = JSON.parse(localStorage.getItem('pio_ab') || '[]');
+let abCatSel = { ico:'🎬', cat:'Eğlence' };
+
+function saveAb() { localStorage.setItem('pio_ab', JSON.stringify(abonelikler)); }
+
+function openAbonelikModal() {
+  document.getElementById('ab-ad').value = '';
+  document.getElementById('ab-tut').value = '';
+  document.getElementById('ab-gun').value = '';
+  document.getElementById('m-abonelik').classList.add('open');
+}
+document.getElementById('m-abonelik').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeM('m-abonelik'); });
+
+function selAbCat(el, ico, cat) {
+  document.querySelectorAll('#ab-cat-grid .cc').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+  abCatSel = { ico, cat };
+}
+
+function addAbonelik() {
+  const ad = document.getElementById('ab-ad').value.trim();
+  const tut = parseFloat(document.getElementById('ab-tut').value);
+  const gun = parseInt(document.getElementById('ab-gun').value) || 1;
+  if(!ad || !tut || tut<=0) return;
+  abonelikler.push({ id: Date.now(), ad, tut, ico: abCatSel.ico, cat: abCatSel.cat, gun });
+  saveAb(); renderAbonelik(); closeM('m-abonelik');
+}
+
+function deleteAbonelik(id) {
+  abonelikler = abonelikler.filter(a=>a.id!==id);
+  saveAb(); renderAbonelik();
+}
+
+function renderAbonelik() {
+  const toplam = abonelikler.reduce((a,x)=>a+x.tut, 0);
+  document.getElementById('ab-toplam').style.display = 'flex';
+  document.getElementById('ab-toplam').innerHTML = `
+    <div>
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-family:var(--fd)">Aylık toplam</div>
+      <div style="font-family:var(--fd);font-size:28px;font-weight:700;color:var(--rose)">₺${fmt(toplam)}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:var(--text3);font-family:var(--fd)">Yıllık</div>
+      <div style="font-family:var(--fd);font-size:16px;font-weight:600;color:var(--text2)">₺${fmt(toplam*12)}</div>
+    </div>`;
+
+  const list = document.getElementById('abonelik-list');
+  if (!abonelikler.length) {
+    list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Henüz abonelik yok</div>`;
+    return;
+  }
+  list.innerHTML = abonelikler.map(a=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--glass);border-radius:14px;margin-bottom:8px;border:0.5px solid var(--border2)">
+      <div style="width:42px;height:42px;border-radius:12px;background:var(--violet-dim);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${a.ico}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--fd);font-size:13px;font-weight:600;color:var(--text)">${a.ad}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${a.cat} · Her ayın ${a.gun}. günü</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--rose)">₺${fmt(a.tut)}/ay</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;cursor:pointer;color:var(--rose)" onclick="deleteAbonelik(${a.id})">🗑 Sil</div>
+      </div>
+    </div>`).join('');
+}
+
+// ══ DÖVİZ & ALTIN ══
+let dovizData = {};
+
+async function dovizYenile() {
+  const el = document.getElementById('doviz-cards');
+  el.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--violet);font-family:var(--fd);font-size:13px;animation:pulse 1s infinite">✦ Kurlar yükleniyor...</div>`;
+  try {
+    const res = await fetch('https://api.exchangerate-api.com/v4/latest/TRY');
+    const data = await res.json();
+    const usd = 1 / data.rates.USD;
+    const eur = 1 / data.rates.EUR;
+    const gbp = 1 / data.rates.GBP;
+    // Altın tahmini (gram altın ~USD 60 = TL bazında)
+    const altin = usd * 60;
+    dovizData = { usd, eur, gbp, altin };
+    el.innerHTML = [
+      { ad:'Dolar', sym:'$', val:usd, ico:'🇺🇸', color:'var(--teal)' },
+      { ad:'Euro', sym:'€', val:eur, ico:'🇪🇺', color:'var(--blue)' },
+      { ad:'Sterlin', sym:'£', val:gbp, ico:'🇬🇧', color:'var(--violet)' },
+      { ad:'Gram Altın', sym:'g', val:altin, ico:'🥇', color:'var(--amber)' },
+    ].map(d=>`
+      <div style="background:var(--glass);border:0.5px solid var(--border2);border-radius:16px;padding:14px 16px">
+        <div style="font-size:20px;margin-bottom:8px">${d.ico}</div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--fd)">${d.ad}</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:700;color:${d.color};margin-top:4px">₺${d.val.toFixed(2)}</div>
+      </div>`).join('');
+    hesaplaBirikim();
+    renderBakiyeDoviz();
+  } catch(e) {
+    el.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--rose);font-size:13px">Bağlantı hatası. Tekrar dene.</div>`;
+  }
+}
+
+function hesaplaBirikim() {
+  const tl = parseFloat(document.getElementById('birikim-input')?.value) || 0;
+  const el = document.getElementById('birikim-sonuc');
+  if (!el) return;
+  if (!tl || !dovizData.usd) { el.innerHTML=''; return; }
+  el.innerHTML = [
+    { ad:'Dolar', val:(tl/dovizData.usd).toFixed(2), sym:'$', color:'var(--teal)' },
+    { ad:'Euro', val:(tl/dovizData.eur).toFixed(2), sym:'€', color:'var(--blue)' },
+    { ad:'Gram Altın', val:(tl/dovizData.altin).toFixed(2), sym:'gr', color:'var(--amber)' },
+    { ad:'Sterlin', val:(tl/dovizData.gbp).toFixed(2), sym:'£', color:'var(--violet)' },
+  ].map(d=>`
+    <div class="hs">
+      <div class="hs-l">${d.ad}</div>
+      <div class="hs-v" style="color:${d.color}">${d.sym}${d.val}</div>
+    </div>`).join('');
+}
+
+function renderBakiyeDoviz() {
+  const el = document.getElementById('bakiye-doviz');
+  if (!el || !dovizData.usd) return;
+  const gelir = txs.filter(t=>t.g).reduce((a,t)=>a+t.t, 0);
+  const gider = txs.filter(t=>!t.g).reduce((a,t)=>a+t.t, 0);
+  const net = gelir - gider;
+  if (!net) { el.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:8px 0">Harcama ekledikten sonra görünür</div>`; return; }
+  el.innerHTML = [
+    { ad:'Net TL', val:'₺'+fmt(net), color: net>=0?'var(--teal)':'var(--rose)' },
+    { ad:'Dolar', val:'$'+(net/dovizData.usd).toFixed(0), color:'var(--teal)' },
+    { ad:'Euro', val:'€'+(net/dovizData.eur).toFixed(0), color:'var(--blue)' },
+    { ad:'Gram Altın', val:(net/dovizData.altin).toFixed(1)+'gr', color:'var(--amber)' },
+  ].map(d=>`<div class="hs"><div class="hs-l">${d.ad}</div><div class="hs-v" style="color:${d.color}">${d.val}</div></div>`).join('');
+}
+
+// ══ FATURA TAKVİMİ ══
+let faturalar = JSON.parse(localStorage.getItem('pio_fat') || '[]');
+
+function saveFat() { localStorage.setItem('pio_fat', JSON.stringify(faturalar)); }
+
+function openFaturaModal() {
+  document.getElementById('fat-ad').value = '';
+  document.getElementById('fat-tut').value = '';
+  document.getElementById('fat-tar').value = '';
+  const d = new Date(); d.setDate(d.getDate()+7);
+  document.getElementById('fat-tar').value = d.toISOString().split('T')[0];
+  document.getElementById('m-fatura').classList.add('open');
+}
+document.getElementById('m-fatura').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeM('m-fatura'); });
+
+function addFatura() {
+  const ad = document.getElementById('fat-ad').value.trim();
+  const tut = parseFloat(document.getElementById('fat-tut').value);
+  const tar = document.getElementById('fat-tar').value;
+  const tekrar = document.getElementById('fat-tekrar').value;
+  if(!ad || !tar) return;
+  faturalar.push({ id: Date.now(), ad, tut: tut||0, tar, tekrar, odendi: false });
+  saveFat(); renderFatura(); closeM('m-fatura');
+}
+
+function toggleOdendi(id) {
+  const f = faturalar.find(x=>x.id===id);
+  if(f) { f.odendi = !f.odendi; saveFat(); renderFatura(); }
+}
+
+function deleteFatura(id) {
+  faturalar = faturalar.filter(f=>f.id!==id);
+  saveFat(); renderFatura();
+}
+
+function renderFatura() {
+  const bugun = new Date();
+  const haftaSonu = new Date(); haftaSonu.setDate(haftaSonu.getDate()+7);
+
+  const buHafta = faturalar.filter(f=>{
+    const d = new Date(f.tar);
+    return !f.odendi && d >= bugun && d <= haftaSonu;
+  });
+
+  const bh = document.getElementById('fatura-bu-hafta');
+  if (!buHafta.length) {
+    bh.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:8px 0">Bu hafta ödeme yok 🎉</div>`;
+  } else {
+    bh.innerHTML = buHafta.map(f=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--border)">
+        <div>
+          <div style="font-family:var(--fd);font-size:13px;color:var(--text)">${f.ad}</div>
+          <div style="font-size:11px;color:var(--rose);margin-top:2px">${fdate(f.tar)}</div>
+        </div>
+        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--amber)">₺${fmt(f.tut)}</div>
+      </div>`).join('');
+  }
+
+  const sorted = [...faturalar].sort((a,b)=>new Date(a.tar)-new Date(b.tar));
+  const list = document.getElementById('fatura-list');
+  if(!sorted.length) { list.innerHTML=''; return; }
+
+  list.innerHTML = sorted.map(f=>{
+    const gecti = new Date(f.tar) < bugun && !f.odendi;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--glass);border-radius:14px;margin-bottom:8px;border:0.5px solid ${gecti?'rgba(251,113,133,0.3)':'var(--border2)'};opacity:${f.odendi?0.5:1}">
+      <div onclick="toggleOdendi(${f.id})" style="width:24px;height:24px;border-radius:50%;border:1.5px solid ${f.odendi?'var(--teal)':'var(--border2)'};background:${f.odendi?'var(--teal-dim)':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:12px">${f.odendi?'✓':''}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--fd);font-size:13px;font-weight:600;color:var(--text);text-decoration:${f.odendi?'line-through':''}">${f.ad}</div>
+        <div style="font-size:11px;color:${gecti?'var(--rose)':'var(--text3)'};margin-top:2px">${gecti?'⚠ Gecikti — ':''} ${fdate(f.tar)} · ${f.tekrar}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--text)">₺${fmt(f.tut)}</div>
+        <div style="font-size:10px;color:var(--rose);cursor:pointer;margin-top:4px" onclick="deleteFatura(${f.id})">🗑 Sil</div>
+      </div>
+    </div>`}).join('');
+}
+
+
+// ══ SESLİ KAYIT ══
+let recognition = null;
+let voiceResult = null;
+let isListening = false;
+
+document.getElementById('m-voice').addEventListener('click', e => {
+  if (e.target === e.currentTarget) { stopVoice(); closeM('m-voice'); }
+});
+
+function toggleVoice() {
+  resetVoiceUI();
+  document.getElementById('m-voice').classList.add('open');
+}
+
+function resetVoiceUI() {
+  voiceResult = null;
+  isListening = false;
+  document.getElementById('voice-status').textContent = 'Butona bas ve konuş';
+  document.getElementById('voice-transcript').style.display = 'none';
+  document.getElementById('voice-processing').style.display = 'none';
+  document.getElementById('voice-result').style.display = 'none';
+  document.getElementById('voice-save-btn').style.display = 'none';
+  document.getElementById('voice-examples').style.display = 'flex';
+  const btn = document.getElementById('voice-btn');
+  btn.style.background = 'linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.25))';
+  btn.style.borderColor = 'rgba(52,211,153,0.4)';
+  btn.style.transform = 'scale(1)';
+  btn.innerHTML = '🎙️';
+}
+
+function startVoice() {
+  if (isListening) { stopVoice(); return; }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('voice-status').textContent = '⚠ Tarayıcın sesli girişi desteklemiyor. Chrome kullan.';
+    document.getElementById('voice-status').style.color = 'var(--rose)';
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'tr-TR';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  isListening = true;
+  const btn = document.getElementById('voice-btn');
+  btn.style.background = 'linear-gradient(135deg, rgba(251,113,133,0.2), rgba(251,113,133,0.35))';
+  btn.style.borderColor = 'rgba(251,113,133,0.6)';
+  btn.style.animation = 'pulse 0.8s ease-in-out infinite';
+  btn.innerHTML = '⏹';
+  document.getElementById('voice-status').textContent = '🔴 Dinliyorum...';
+  document.getElementById('voice-status').style.color = 'var(--rose)';
+  document.getElementById('voice-examples').style.display = 'none';
+
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+    document.getElementById('voice-transcript').style.display = 'block';
+    document.getElementById('voice-transcript').textContent = '"' + transcript + '"';
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    btn.style.animation = 'none';
+    const transcript = document.getElementById('voice-transcript').textContent;
+    if (transcript && transcript.length > 2) {
+      processVoice(transcript.replace(/"/g, ''));
+    } else {
+      resetVoiceUI();
+    }
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    btn.style.animation = 'none';
+    document.getElementById('voice-status').textContent = '⚠ Ses alınamadı, tekrar dene.';
+    document.getElementById('voice-status').style.color = 'var(--rose)';
+    resetVoiceUI();
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  if (recognition) recognition.stop();
+  isListening = false;
+}
+
+async function processVoice(transcript) {
+  document.getElementById('voice-processing').style.display = 'block';
+  document.getElementById('voice-status').textContent = '✦ AI anlıyor...';
+  document.getElementById('voice-status').style.color = 'var(--violet)';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: `Kullanıcı sesli olarak şunu söyledi: "${transcript}"
+Bu bir finansal işlem açıklaması. Bilgileri çıkar ve SADECE JSON döndür, başka hiçbir şey yazma:
+{"not":"yer/işlem adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}
+Tutar bulamazsan 0 yaz. Maaş/gelir söylenmişse gelirMi true olsun.`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Parse hatası');
+    const parsed = JSON.parse(match[0]);
+
+    voiceResult = parsed;
+
+    document.getElementById('voice-processing').style.display = 'none';
+    document.getElementById('voice-result').style.display = 'block';
+    document.getElementById('vr-not').textContent = parsed.not || transcript;
+    document.getElementById('vr-kat').textContent = (parsed.gelirMi ? '📥 Gelir' : '📤 Gider') + ' · ' + (parsed.kategori || 'Diğer');
+    document.getElementById('vr-tut').textContent = (parsed.gelirMi ? '+' : '-') + '₺' + fmt(parsed.tutar || 0);
+    document.getElementById('vr-tut').style.color = parsed.gelirMi ? 'var(--teal)' : 'var(--rose)';
+    document.getElementById('voice-save-btn').style.display = 'block';
+    document.getElementById('voice-status').textContent = 'Doğru mu? Kaydet veya iptal et.';
+    document.getElementById('voice-status').style.color = 'var(--teal)';
+
+    const btn = document.getElementById('voice-btn');
+    btn.style.background = 'linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.25))';
+    btn.style.borderColor = 'rgba(52,211,153,0.4)';
+    btn.innerHTML = '🎙️';
+
+  } catch(err) {
+    document.getElementById('voice-processing').style.display = 'none';
+    document.getElementById('voice-status').textContent = '⚠ Anlaşılamadı, tekrar dene.';
+    document.getElementById('voice-status').style.color = 'var(--rose)';
+    setTimeout(resetVoiceUI, 2000);
+  }
+}
+
+function saveVoiceTx() {
+  if (!voiceResult) return;
+  txs.push({
+    id: Date.now(),
+    n: voiceResult.not || 'Sesli işlem',
+    t: voiceResult.tutar || 0,
+    k: voiceResult.gelirMi ? 'Gelir' : (voiceResult.kategori || 'Diğer'),
+    d: new Date().toISOString().split('T')[0],
+    g: voiceResult.gelirMi || false
+  });
+  save(); render();
+  closeM('m-voice');
+  resetVoiceUI();
+}
+
+function fillVoiceExample(text) {
+  document.getElementById('voice-transcript').style.display = 'block';
+  document.getElementById('voice-transcript').textContent = '"' + text + '"';
+  document.getElementById('voice-examples').style.display = 'none';
+  processVoice(text);
+}
+
+// ── FİŞ TARAMA ──
+async function scanFis(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Preview göster
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('scan-img').src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  // Loading göster
+  document.getElementById('scan-loading').style.display = 'block';
+  document.getElementById('scan-preview').style.display = 'none';
+
+  // Base64'e çevir
+  const base64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Dosya okunamadı'));
+    r.readAsDataURL(file);
+  });
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: file.type || 'image/jpeg', data: base64 }
+            },
+            {
+              type: 'text',
+              text: `Bu fiş, dekont veya fatura görselinden bilgileri çıkar ve SADECE şu JSON formatında yanıt ver, başka hiçbir şey yazma:
+{"not":"işlem açıklaması (mağaza/yer adı)","tutar":sayısal_tutar,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}
+Tutar bulamazsan 0 yaz. Tarih bulamazsan bugünün tarihini yaz: ${new Date().toISOString().split('T')[0]}`
+            }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+
+    // JSON parse
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON bulunamadı');
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Formu doldur
+    if (parsed.not) document.getElementById('f-not').value = parsed.not;
+    if (parsed.tutar && parsed.tutar > 0) document.getElementById('f-tut').value = parsed.tutar;
+    if (parsed.tarih) document.getElementById('f-tar').value = parsed.tarih;
+    if (parsed.kategori) selCatByName(parsed.kategori);
+
+    // Başarı göster
+    document.getElementById('scan-loading').style.display = 'none';
+    document.getElementById('scan-preview').style.display = 'block';
+
+    // Öneri mesajı
+    const badge = document.getElementById('cat-suggest');
+    badge.textContent = `✦ Fiş okundu — ${parsed.kategori || 'kategori'} seçildi`;
+    badge.style.opacity = '1';
+    setTimeout(() => badge.style.opacity = '0', 3000);
+
+  } catch (err) {
+    document.getElementById('scan-loading').style.display = 'none';
+    document.getElementById('scan-preview').style.display = 'block';
+
+    const badge = document.getElementById('cat-suggest');
+    badge.textContent = '⚠ Fiş okunamadı, manuel gir';
+    badge.style.color = 'var(--rose)';
+    badge.style.opacity = '1';
+    setTimeout(() => { badge.style.opacity = '0'; badge.style.color = 'var(--teal)'; }, 3000);
+  }
+
+  // Input'u sıfırla (aynı dosyayı tekrar seçebilmek için)
+  input.value = '';
+}
+
 const catKeywords = {
   'Market':    ['migros','bim','a101','şok','carrefour','market','süpermarket','bakkal','manav','kasap','temizlik','deterjan','sabun'],
   'Yemek':     ['yemek','restaurant','restoran','cafe','kahve','pizza','burger','döner','iskender','lahmacun','çay','türk','starbucks','mcdonald','kfc','getir','yemeksepeti','trendyol yemek','sipariş'],
@@ -858,10 +1554,8 @@ document.getElementById('f-not').addEventListener('input', function() {
 });
 
 // ── GERÇEK AI API ──
-let chatHistory = [];
-
 function initChat() {
-  chatHistory = [];
+  chatHistory.length = 0;
   const c = document.getElementById('chat');
   c.innerHTML = `
     <div class="cb cb-ai">Merhaba! Ben ParaIO'nun AI koçuyum ✦<br>Harcama verilerini analiz ederek <strong>sana özel</strong> öneriler sunuyorum — genel tavsiyeler değil, senin rakamlarına göre!</div>
@@ -932,6 +1626,8 @@ ${buildContext()}`;
 }
 
 render();
+renderAbonelik();
+renderFatura();
 </script>
 </body>
 </html>
