@@ -10,16 +10,16 @@ export default async function handler(req, res) {
     let parts = [];
 
     if (type === 'voice') {
-      parts = [{ text: `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nSADECE JSON döndür, başka hiçbir şey yazma:\n{"not":"yer/işlem adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}\nTutar bulamazsan 0 yaz.` }];
+      parts = [{ text: `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nSADECE JSON döndür:\n{"not":"yer adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}` }];
     } else if (type === 'scan') {
       parts = [
         { inline_data: { mime_type: content.mediaType, data: content.data } },
-        { text: `SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayısal_tutar,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}` }
+        { text: `SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayı,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}` }
       ];
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
