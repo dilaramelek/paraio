@@ -7,22 +7,14 @@ export default async function handler(req, res) {
 
   try {
     const { type, content } = req.body;
-    let prompt = '';
     let parts = [];
 
     if (type === 'voice') {
-      prompt = `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"
-Bu bir finansal işlem. Bilgileri çıkar ve SADECE JSON döndür, başka hiçbir şey yazma:
-{"not":"yer/işlem adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}
-Tutar bulamazsan 0 yaz. Maaş/gelir söylenmişse gelirMi true olsun.`;
-      parts = [{ text: prompt }];
+      parts = [{ text: `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nBu bir finansal işlem. Bilgileri çıkar ve SADECE JSON döndür, başka hiçbir şey yazma:\n{"not":"yer/işlem adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}\nTutar bulamazsan 0 yaz. Maaş/gelir söylenmişse gelirMi true olsun.` }];
     } else if (type === 'scan') {
-      prompt = `Bu fiş veya dekonttaki bilgileri çıkar ve SADECE JSON döndür:
-{"not":"işlem adı","tutar":sayısal_tutar,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}
-Tutar bulamazsan 0 yaz. Tarih bulamazsan: ${new Date().toISOString().split('T')[0]}`;
       parts = [
         { inline_data: { mime_type: content.mediaType, data: content.data } },
-        { text: prompt }
+        { text: `Bu fiş veya dekonttaki bilgileri çıkar ve SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayısal_tutar,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}\nTutar bulamazsan 0 yaz. Tarih bulamazsan: ${new Date().toISOString().split('T')[0]}` }
       ];
     }
 
@@ -31,12 +23,19 @@ Tutar bulamazsan 0 yaz. Tarih bulamazsan: ${new Date().toISOString().split('T')[
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts }] })
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 500 }
+        })
       }
     );
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Gemini response'u düzgün parse et
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text 
+      || data?.candidates?.[0]?.output 
+      || '';
 
     return res.status(200).json({
       content: [{ type: 'text', text }]
