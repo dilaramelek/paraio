@@ -10,11 +10,11 @@ export default async function handler(req, res) {
     let parts = [];
 
     if (type === 'voice') {
-      parts = [{ text: `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nBu bir finansal işlem. Bilgileri çıkar ve SADECE JSON döndür, başka hiçbir şey yazma:\n{"not":"yer/işlem adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}\nTutar bulamazsan 0 yaz. Maaş/gelir söylenmişse gelirMi true olsun.` }];
+      parts = [{ text: `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nSADECE JSON döndür:\n{"not":"yer adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}` }];
     } else if (type === 'scan') {
       parts = [
         { inline_data: { mime_type: content.mediaType, data: content.data } },
-        { text: `Bu fiş veya dekonttaki bilgileri çıkar ve SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayısal_tutar,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}\nTutar bulamazsan 0 yaz. Tarih bulamazsan: ${new Date().toISOString().split('T')[0]}` }
+        { text: `SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayı,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}` }
       ];
     }
 
@@ -23,24 +23,19 @@ export default async function handler(req, res) {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 500 }
-        })
+        body: JSON.stringify({ contents: [{ role: 'user', parts }] })
       }
     );
 
     const data = await response.json();
+    console.log('GEMINI RAW:', JSON.stringify(data));
     
-    // Gemini response'u düzgün parse et
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text 
-      || data?.candidates?.[0]?.output 
-      || '';
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    console.log('GEMINI TEXT:', text);
 
-    return res.status(200).json({
-      content: [{ type: 'text', text }]
-    });
+    return res.status(200).json({ content: [{ type: 'text', text }] });
   } catch (err) {
+    console.log('ERROR:', err.message);
     return res.status(500).json({ error: err.message });
   }
 }
