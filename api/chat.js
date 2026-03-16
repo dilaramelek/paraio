@@ -10,11 +10,11 @@ export default async function handler(req, res) {
 
     const geminiMessages = messages.map((m, i) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: i === 0 && system ? `${system}\n\nKullanıcı: ${m.content}` : m.content }]
+      parts: [{ text: i === 0 && system ? `${system}\n\nKullanıcı: ${m.content}` : (typeof m.content === 'string' ? m.content : JSON.stringify(m.content)) }]
     }));
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
