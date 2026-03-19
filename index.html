@@ -1360,32 +1360,55 @@ function stopVoice() {
   isListening = false;
 }
 
-async function processVoice(transcript) {
+function processVoice(transcript) {
   document.getElementById('voice-processing').style.display = 'block';
-  document.getElementById('voice-status').textContent = '✦ AI anlıyor...';
+  document.getElementById('voice-status').textContent = '✦ Anlıyor...';
   document.getElementById('voice-status').style.color = 'var(--violet)';
 
   try {
-    const res = await fetch('/api/process', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'voice', content: { transcript } })
-    });
+    const low = transcript.toLowerCase();
 
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-    const match = text.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('Parse hatası');
-    const parsed = JSON.parse(match[0]);
+    // Tutar bul — sayıları yakala
+    const tutarMatch = low.match(/(\d+[\.,]?\d*)\s*(lira|tl|₺)?/);
+    const tutar = tutarMatch ? parseFloat(tutarMatch[1].replace(',', '.')) : 0;
 
-    voiceResult = parsed;
+    // Gelir mi kontrol et
+    const gelirKelimeler = ['maaş','gelir','yattı','aldım gelir','kazandım','bonus','ödeme geldi','transfer geldi'];
+    const gelirMi = gelirKelimeler.some(k => low.includes(k));
+
+    // Kategori tahmin et
+    const kategoriMap = {
+      'Market':  ['migros','bim','a101','şok','carrefour','market','bakkal','manav','alışveriş'],
+      'Yemek':   ['yemek','restoran','cafe','kahve','pizza','burger','döner','getir','sipariş','yedim','içtim'],
+      'Ulaşım':  ['benzin','akaryakıt','taksi','uber','metro','otobüs','tren','uçak','bilet','park','hgs'],
+      'Fatura':  ['elektrik','doğalgaz','su','internet','fatura','aidat','telefon','turkcell','vodafone'],
+      'Kira':    ['kira','ev kirası','konut'],
+      'Eğlence': ['sinema','oyun','netflix','spotify','konser','eğlence','tatil','otel'],
+      'Sağlık':  ['eczane','ilaç','doktor','hastane','sağlık','diş'],
+      'Gelir':   ['maaş','gelir','yattı','kazandım','bonus']
+    };
+
+    let kategori = 'Diğer';
+    for (const [kat, kelimeler] of Object.entries(kategoriMap)) {
+      if (kelimeler.some(k => low.includes(k))) { kategori = kat; break; }
+    }
+    if (gelirMi) kategori = 'Gelir';
+
+    // Yer/işlem adını tahmin et — ilk anlamlı kelimeler
+    const stopWords = ['lira','tl','harcadım','aldım','ödedim','yattı','geldi','için','bir','bu','ve','de','da'];
+    const words = transcript.split(' ').filter(w => !stopWords.includes(w.toLowerCase()) && isNaN(w));
+    const not = words.slice(0, 3).join(' ') || transcript;
+
+    if (tutar === 0 && !gelirMi) throw new Error('Tutar anlaşılamadı');
+
+    voiceResult = { not, tutar, gelirMi, kategori };
 
     document.getElementById('voice-processing').style.display = 'none';
     document.getElementById('voice-result').style.display = 'block';
-    document.getElementById('vr-not').textContent = parsed.not || transcript;
-    document.getElementById('vr-kat').textContent = (parsed.gelirMi ? '📥 Gelir' : '📤 Gider') + ' · ' + (parsed.kategori || 'Diğer');
-    document.getElementById('vr-tut').textContent = (parsed.gelirMi ? '+' : '-') + '₺' + fmt(parsed.tutar || 0);
-    document.getElementById('vr-tut').style.color = parsed.gelirMi ? 'var(--teal)' : 'var(--rose)';
+    document.getElementById('vr-not').textContent = not;
+    document.getElementById('vr-kat').textContent = (gelirMi ? '📥 Gelir' : '📤 Gider') + ' · ' + kategori;
+    document.getElementById('vr-tut').textContent = (gelirMi ? '+' : '-') + '₺' + fmt(tutar);
+    document.getElementById('vr-tut').style.color = gelirMi ? 'var(--teal)' : 'var(--rose)';
     document.getElementById('voice-save-btn').style.display = 'block';
     document.getElementById('voice-status').textContent = 'Doğru mu? Kaydet veya iptal et.';
     document.getElementById('voice-status').style.color = 'var(--teal)';
@@ -1397,9 +1420,9 @@ async function processVoice(transcript) {
 
   } catch(err) {
     document.getElementById('voice-processing').style.display = 'none';
-    document.getElementById('voice-status').textContent = '⚠ Anlaşılamadı, tekrar dene.';
+    document.getElementById('voice-status').textContent = '⚠ "Migros 486 lira" gibi söyle';
     document.getElementById('voice-status').style.color = 'var(--rose)';
-    setTimeout(resetVoiceUI, 2000);
+    setTimeout(resetVoiceUI, 3000);
   }
 }
 
