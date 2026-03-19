@@ -7,28 +7,30 @@ export default async function handler(req, res) {
 
   try {
     const { type, content } = req.body;
-    let parts = [];
+    let userMessage = '';
 
     if (type === 'voice') {
-      parts = [{ text: `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nSADECE JSON döndür:\n{"not":"yer adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}` }];
+      userMessage = `Kullanıcı sesli olarak şunu söyledi: "${content.transcript}"\nSADECE JSON döndür, başka hiçbir şey yazma:\n{"not":"yer/işlem adı","tutar":sayı,"gelirMi":true/false,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Gelir|Diğer"}`;
     } else if (type === 'scan') {
-      parts = [
-        { inline_data: { mime_type: content.mediaType, data: content.data } },
-        { text: `SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayı,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}` }
-      ];
+      userMessage = `Bu fiş veya dekonttaki bilgileri çıkar, SADECE JSON döndür:\n{"not":"işlem adı","tutar":sayısal_tutar,"kategori":"Market|Yemek|Ulaşım|Fatura|Kira|Eğlence|Sağlık|Diğer","tarih":"YYYY-MM-DD"}`;
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts }] })
-      }
-    );
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://paraio.vercel.app',
+        'X-Title': 'ParaIO'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.2-3b-instruct:free',
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
 
     const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = data?.choices?.[0]?.message?.content || '';
     return res.status(200).json({ content: [{ type: 'text', text }] });
   } catch (err) {
     return res.status(500).json({ error: err.message });
