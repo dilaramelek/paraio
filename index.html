@@ -491,6 +491,29 @@ body::before {
       </div>
     </div>
 
+    <!-- MİZAHİ MOTİVASYON KARTI -->
+    <div id="motivasyon-card" style="
+      margin: 12px 16px 0;
+      background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(167,139,250,0.08));
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 20px; padding: 14px 16px;
+      display: flex; gap: 12px; align-items: center;
+      backdrop-filter: blur(12px);
+      animation: fadeUp 0.45s 0.1s ease both;
+      cursor: pointer;
+    " onclick="yeniMotivasyon()">
+      <div style="font-size: 32px; flex-shrink:0" id="mot-emoji">🐣</div>
+      <div style="flex:1">
+        <div style="font-family:var(--fd);font-size:12px;font-weight:600;color:var(--amber);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.06em">
+          <span id="streak-text">Streak: 0 gün</span>
+        </div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.5" id="mot-text">
+          Henüz başlamadın — paranı tanımak için ilk adımı at! 👋
+        </div>
+      </div>
+      <div style="font-size:18px;color:var(--text3)">↻</div>
+    </div>
+
     <div class="qa-grid">
       <div class="qa" onclick="openAdd()"><div class="qa-ico">📤</div><div class="qa-lbl">Gider</div></div>
       <div class="qa" onclick="openAdd('gelir')"><div class="qa-ico">📥</div><div class="qa-lbl">Gelir</div></div>
@@ -932,6 +955,7 @@ function render() {
   updateAI(gelir,gider);
   updateAnaliz(gider);
   updateHedef(gelir);
+  motivasyonGoster();
 }
 
 function updateAI(gelir,gider) {
@@ -1446,6 +1470,129 @@ function fillVoiceExample(text) {
   document.getElementById('voice-transcript').textContent = '"' + text + '"';
   document.getElementById('voice-examples').style.display = 'none';
   processVoice(text);
+}
+
+// ══ STREAK & MİZAHİ MOTİVASYON ══
+const motivasyonlar = {
+  baslangic: [
+    { e: '🐣', t: 'Henüz başlamadın — paranı tanımak için ilk adımı at!' },
+    { e: '👀', t: 'Paran nerede bilmiyor musun? Biz biliyoruz 😏' },
+    { e: '🌱', t: 'Her büyük birikim tek bir harcama kaydıyla başlar.' }
+  ],
+  streak1: [
+    { e: '🔥', t: 'İlk gün! Devam et, alışkanlık 21 günde oluşur.' },
+    { e: '👏', t: 'Başladın! Çoğu insan buraya bile gelemez.' },
+    { e: '🎯', t: 'İlk adım atıldı. Şimdi geri dönüş yok!' }
+  ],
+  streak3: [
+    { e: '💪', t: '3 gün üst üste! Muhasebeci ruhun uyandı.' },
+    { e: '🔥', t: '3 günlük seri! Para senden korkmaya başladı.' },
+    { e: '😤', t: '3 gün! Artık "param nereye gitti" demeyeceksin.' }
+  ],
+  streak7: [
+    { e: '🏆', t: '7 gün! Resmi olarak "paranı bilen insan" unvanı kazandın.' },
+    { e: '⚡', t: 'Bir hafta! Banka bile senden etkilendi (belki).' },
+    { e: '🦁', t: '7 günlük seri! Finansal aslan moduna geçtin.' }
+  ],
+  streak30: [
+    { e: '👑', t: '30 gün! Sen artık bir efsanesin. Para senin arkadaşın.' },
+    { e: '🚀', t: 'Bir ay! Muhasebe firması kurma vakti geldi mi?' },
+    { e: '💰', t: '30 günlük seri! Para "bu kişi beni takip ediyor" diye korkuyor.' }
+  ],
+  marketFazla: [
+    { e: '🛒', t: 'Migros seni artık ismiyle tanıyor. Aile oldunuz 😂' },
+    { e: '🥦', t: 'Market harcaman çok yüksek. Bahçe kurmayı düşün.' },
+    { e: '🧾', t: 'Markete bu kadar para verince kasiyerler "hoş geldin" diyor mu?' }
+  ],
+  yemekFazla: [
+    { e: '🍕', t: 'Yemek siparişlerin çok fazla. Mutfak dediğimiz şey var 😄' },
+    { e: '👨‍🍳', t: 'Bu parayla şef olabilirdin. Hâlâ vakit var!' },
+    { e: '🛵', t: 'Getir kurye sizi çok özlüyor olmalı.' }
+  ],
+  iyiGidiyor: [
+    { e: '😎', t: 'Bu ay çok iyisin! Cüzdanın senden mutlu.' },
+    { e: '✨', t: 'Harika gidiyorsun! Para seni seviyor.' },
+    { e: '🎉', t: 'Bu ay mükemmel! Kendine küçük bir ödül hak ettin.' }
+  ],
+  kotiGidiyor: [
+    { e: '😅', t: 'Giderler geliri geçti. Ama farkında olman zaten büyük adım!' },
+    { e: '🆘', t: 'Cüzdan alarm veriyor ama panik yok, plan yapalım.' },
+    { e: '🎢', t: 'Bu ay biraz çalkantılı ama en azından takip ediyorsun!' }
+  ],
+  hicVeri: [
+    { e: '👻', t: 'Harcamalar kayıt altında değil. Paranın hantu çıkacak! 👻' },
+    { e: '🕵️', t: 'Paranı takip etmiyorsan, para seni takip ediyor.' },
+    { e: '😴', t: 'Uygulama sizi özledi. Harcama ekleyin lütfen!' }
+  ]
+};
+
+function rastgele(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function hesaplaStreak() {
+  const bugun = new Date().toDateString();
+  const dun = new Date(Date.now() - 86400000).toDateString();
+  let streak = parseInt(localStorage.getItem('pio_streak') || '0');
+  const sonGun = localStorage.getItem('pio_streak_gun') || '';
+
+  if (sonGun === bugun) return streak;
+  if (sonGun === dun) { streak++; }
+  else if (sonGun !== '') { streak = 1; }
+  else { streak = txs.length > 0 ? 1 : 0; }
+
+  localStorage.setItem('pio_streak', streak);
+  localStorage.setItem('pio_streak_gun', bugun);
+  return streak;
+}
+
+function motivasyonGoster() {
+  const streak = hesaplaStreak();
+  const gelir = txs.filter(t=>t.g).reduce((a,t)=>a+t.t, 0);
+  const gider = txs.filter(t=>!t.g).reduce((a,t)=>a+t.t, 0);
+  const cats = {};
+  txs.filter(t=>!t.g).forEach(t=>{ cats[t.k]=(cats[t.k]||0)+t.t; });
+
+  let msg;
+
+  if (txs.length === 0) {
+    msg = rastgele(motivasyonlar.baslangic);
+  } else if (streak >= 30) {
+    msg = rastgele(motivasyonlar.streak30);
+  } else if (streak >= 7) {
+    msg = rastgele(motivasyonlar.streak7);
+  } else if (streak >= 3) {
+    msg = rastgele(motivasyonlar.streak3);
+  } else if (streak >= 1) {
+    msg = rastgele(motivasyonlar.streak1);
+  } else if (cats['Market'] > gelir * 0.3) {
+    msg = rastgele(motivasyonlar.marketFazla);
+  } else if (cats['Yemek'] > gelir * 0.2) {
+    msg = rastgele(motivasyonlar.yemekFazla);
+  } else if (gelir > 0 && gider < gelir * 0.7) {
+    msg = rastgele(motivasyonlar.iyiGidiyor);
+  } else if (gider > gelir && gelir > 0) {
+    msg = rastgele(motivasyonlar.kotiGidiyor);
+  } else {
+    msg = rastgele(motivasyonlar.hicVeri);
+  }
+
+  document.getElementById('mot-emoji').textContent = msg.e;
+  document.getElementById('mot-text').textContent = msg.t;
+
+  const streakEl = document.getElementById('streak-text');
+  if (streak > 0) {
+    streakEl.textContent = `🔥 ${streak} günlük seri!`;
+    streakEl.style.color = streak >= 7 ? 'var(--teal)' : 'var(--amber)';
+  } else {
+    streakEl.textContent = 'Seri başlatmak için harcama ekle';
+    streakEl.style.color = 'var(--text3)';
+  }
+}
+
+function yeniMotivasyon() {
+  // Karta tıklayınca yeni espri göster
+  const kart = document.getElementById('motivasyon-card');
+  kart.style.transform = 'scale(0.97)';
+  setTimeout(() => { kart.style.transform = 'scale(1)'; motivasyonGoster(); }, 150);
 }
 
 // ── FİŞ TARAMA ──
