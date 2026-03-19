@@ -8,22 +8,26 @@ export default async function handler(req, res) {
   try {
     const { messages, system } = req.body;
 
-    const geminiMessages = messages.map((m, i) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: i === 0 && system ? `${system}\n\nKullanıcı: ${m.content}` : (typeof m.content === 'string' ? m.content : JSON.stringify(m.content)) }]
-    }));
+    const openrouterMessages = system
+      ? [{ role: 'system', content: system }, ...messages]
+      : messages;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: geminiMessages })
-      }
-    );
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://paraio.vercel.app',
+        'X-Title': 'ParaIO'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.2-3b-instruct:free',
+        messages: openrouterMessages
+      })
+    });
 
     const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Bir sorun oluştu.';
+    const text = data?.choices?.[0]?.message?.content || 'Bir sorun oluştu.';
     return res.status(200).json({ content: [{ type: 'text', text }] });
   } catch (err) {
     return res.status(500).json({ error: err.message });
