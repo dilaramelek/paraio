@@ -936,7 +936,8 @@ function render() {
   }
 
   const gelir = txs.filter(t=>t.g).reduce((a,t)=>a+t.t,0);
-  const gider = txs.filter(t=>!t.g).reduce((a,t)=>a+t.t,0);
+  const abonelikToplam = abonelikler.reduce((a,x)=>a+x.tut, 0);
+  const gider = txs.filter(t=>!t.g).reduce((a,t)=>a+t.t,0) + abonelikToplam;
   const net = gelir - gider;
 
   document.getElementById('bal').textContent = fmt(Math.abs(net));
@@ -983,12 +984,13 @@ function updateAnaliz(total) {
   }).join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0">Henüz harcama yok</div>';
 
   const gelir=txs.filter(t=>t.g).reduce((a,t)=>a+t.t,0);
-  const gider=txs.filter(t=>!t.g).reduce((a,t)=>a+t.t,0);
+  const abonelikToplam = abonelikler.reduce((a,x)=>a+x.tut, 0);
+  const gider=txs.filter(t=>!t.g).reduce((a,t)=>a+t.t,0) + abonelikToplam;
   document.getElementById('aozet').innerHTML=`
     <div class="hs"><div class="hs-l">Toplam Gelir</div><div class="hs-v cv">₺${fmt(gelir)}</div></div>
     <div class="hs"><div class="hs-l">Toplam Gider</div><div class="hs-v cr">₺${fmt(gider)}</div></div>
-    <div class="hs"><div class="hs-l">Net</div><div class="hs-v" style="color:${gelir-gider>=0?'var(--teal)':'var(--rose)'}">₺${fmt(gelir-gider)}</div></div>
-    <div class="hs"><div class="hs-l">İşlem</div><div class="hs-v ca">${txs.length}</div></div>`;
+    <div class="hs"><div class="hs-l">Abonelikler</div><div class="hs-v" style="color:var(--rose)">₺${fmt(abonelikToplam)}/ay</div></div>
+    <div class="hs"><div class="hs-l">Net</div><div class="hs-v" style="color:${gelir-gider>=0?'var(--teal)':'var(--rose)'}">₺${fmt(gelir-gider)}</div></div>`;
 }
 
 function updateHedef(gelir) {
@@ -1159,24 +1161,37 @@ async function dovizYenile() {
   const el = document.getElementById('doviz-cards');
   el.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--violet);font-family:var(--fd);font-size:13px;animation:pulse 1s infinite">✦ Kurlar yükleniyor...</div>`;
   try {
-    const res = await fetch('https://api.exchangerate-api.com/v4/latest/TRY');
+    // Güncel TL kurları için frankfurter API
+    const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR,GBP');
     const data = await res.json();
-    const usd = 1 / data.rates.USD;
-    const eur = 1 / data.rates.EUR;
-    const gbp = 1 / data.rates.GBP;
-    // Altın tahmini (gram altın ~USD 60 = TL bazında)
-    const altin = usd * 60;
-    dovizData = { usd, eur, gbp, altin };
+    const usd = data.rates.TRY;
+    const eur = usd / data.rates.EUR;
+    const gbp = usd / data.rates.GBP;
+
+    // Gram altın: Ons altın fiyatını USD cinsinden al, gram'a çevir (1 ons = 31.1 gram)
+    let altinGram = 0;
+    try {
+      const altinRes = await fetch('https://api.frankfurter.app/latest?from=XAU&to=USD');
+      const altinData = await altinRes.json();
+      const onsUSD = altinData.rates.USD;
+      altinGram = (onsUSD / 31.1035) * usd;
+    } catch {
+      // Altın API çalışmazsa tahmini hesapla (ons ~$3300)
+      altinGram = (3300 / 31.1035) * usd;
+    }
+
+    dovizData = { usd, eur, gbp, altin: altinGram };
+
     el.innerHTML = [
       { ad:'Dolar', sym:'$', val:usd, ico:'🇺🇸', color:'var(--teal)' },
       { ad:'Euro', sym:'€', val:eur, ico:'🇪🇺', color:'var(--blue)' },
       { ad:'Sterlin', sym:'£', val:gbp, ico:'🇬🇧', color:'var(--violet)' },
-      { ad:'Gram Altın', sym:'g', val:altin, ico:'🥇', color:'var(--amber)' },
+      { ad:'Gram Altın', sym:'₺', val:altinGram, ico:'🥇', color:'var(--amber)' },
     ].map(d=>`
       <div style="background:var(--glass);border:0.5px solid var(--border2);border-radius:16px;padding:14px 16px">
         <div style="font-size:20px;margin-bottom:8px">${d.ico}</div>
         <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--fd)">${d.ad}</div>
-        <div style="font-family:var(--fd);font-size:18px;font-weight:700;color:${d.color};margin-top:4px">₺${d.val.toFixed(2)}</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:700;color:${d.color};margin-top:4px">${d.sym}${d.val.toFixed(2)}</div>
       </div>`).join('');
     hesaplaBirikim();
     renderBakiyeDoviz();
